@@ -113,8 +113,17 @@ echo $silver_early_upmigrate $gold_early_upmigrate > /proc/sys/walt/sched_early_
 echo 325 > /proc/sys/walt/walt_low_latency_task_threshold
 
 # cpuset parameters
-echo 0-2 > /dev/cpuset/background/cpus
-echo 0-2 > /dev/cpuset/system-background/cpus
+# CPU layout: 0-2=Silver(little), 3-6=Gold(big), 7=Prime(biggest)
+# Explicitly set all cpusets so tasks always have correct CPU access
+# regardless of which cores were online during early-init copies from root cpuset.
+echo 0-2     > /dev/cpuset/background/cpus
+echo 0-2     > /dev/cpuset/system-background/cpus
+echo 0-7     > /dev/cpuset/foreground/cpus
+echo 0-7     > /dev/cpuset/foreground_window/cpus
+echo 0-7     > /dev/cpuset/top-app/cpus
+echo 0-3     > /dev/cpuset/audio-app/cpus
+echo 0-2     > /dev/cpuset/restricted/cpus
+
 
 # Turn off scheduler boost at the end
 echo 0 > /proc/sys/walt/sched_boost
